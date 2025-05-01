@@ -25,12 +25,19 @@ export class HomePage {
   credits: any[] = [];
   searchResults: any[] = [];
   filterType: string = 'all';
+  startYear: number | null = null;
+  endYear: number | null = null;
+  minYear = 1950;
+  maxYear = new Date().getFullYear();
+  yearRange = { lower: this.minYear, upper: this.maxYear };
+
+
 
   constructor(
     private tmdb: TmdbService,
     private storageService: StorageService,
     private toastController: ToastController
-  ) {}
+  ) { }
 
   onSearchChange() {
     if (this.actorName.trim().length < 2) {
@@ -59,20 +66,36 @@ export class HomePage {
   }
 
   get filteredCredits() {
-    if (this.filterType === 'all') return this.credits;
-    return this.credits.filter(item => item.media_type === this.filterType);
+    return this.credits.filter(item => {
+      const dateStr = item.release_date || item.first_air_date;
+      if (!dateStr) return false;
+  
+      const year = parseInt(dateStr.slice(0, 4), 10);
+  
+      const matchesType = this.filterType === 'all' || item.media_type === this.filterType;
+      const matchesYearRange = year >= this.yearRange.lower && year <= this.yearRange.upper;
+  
+      return matchesType && matchesYearRange;
+    });
   }
+  
+
 
   async save(actor: any) {
     await this.storageService.saveActor(actor);
-  
+
     const toast = await this.toastController.create({
       message: `${actor.name} has been saved!`,
       duration: 2000,
       color: 'success',
-      position: 'top'  
+      position: 'top'
     });
-  
+
     await toast.present();
   }
+
+  onImageError(event: any) {
+    event.target.src = 'assets/img/fallback-poster.jpg';
+  }
+
 }

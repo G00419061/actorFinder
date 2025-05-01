@@ -22,13 +22,6 @@ export const routes: Routes = [
         component: SavedPage,
       },
       {
-        path: 'photo-search',
-        loadComponent: () =>
-          import('./photo-search/photo-search.page').then(
-            (m) => m.PhotoSearchPage
-          ),
-      },
-      {
         path: '',
         redirectTo: 'home',
         pathMatch: 'full',
