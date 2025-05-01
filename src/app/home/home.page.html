@@ -1,13 +1,69 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>
-      Actor Finder
-    </ion-title>
+    <ion-title>Actor Finder</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  
+<ion-content class="ion-padding">
+  <!-- Actor Search Input -->
+  <ion-item>
+    <ion-label position="stacked">Actor</ion-label>
+    <ion-input
+      [(ngModel)]="actorName"
+      (ionInput)="onSearchChange()"
+      placeholder="Enter actor name"
+      clearInput>
+    </ion-input>
+  </ion-item>
+
+  <!-- Actor Profile Image and Full Name -->
+  <ion-card *ngIf="actorImageUrl || actorFullName">
+    <img *ngIf="actorImageUrl" [src]="actorImageUrl" alt="Actor Image" />
+    <ion-card-header>
+      <ion-card-title>{{ actorFullName }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-button
+        fill="solid"
+        color="primary"
+        expand="block"
+        (click)="save(searchResults[0])"
+        class="animate__animated animate__pulse"
+      >
+        Save
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Filter Segment -->
+  <ion-segment [(ngModel)]="filterType">
+    <ion-segment-button value="all">
+      <ion-label>All</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="movie">
+      <ion-label>Movies</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="tv">
+      <ion-label>TV Shows</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Movie/TV Credits List -->
+  <ion-list *ngIf="credits.length > 0">
+    <ion-list-header>
+      Works
+    </ion-list-header>
+    <ion-item *ngFor="let item of filteredCredits">
+      <ion-label>
+        <h2>{{ item.title || item.name }}</h2>
+        <p>{{ item.release_date || item.first_air_date }}</p>
+        <p *ngIf="item.character">Role: {{ item.character }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <!-- No Results -->
+  <p *ngIf="credits.length === 0 && actorName">
+    No results found.
+  </p>
 </ion-content>
-
-

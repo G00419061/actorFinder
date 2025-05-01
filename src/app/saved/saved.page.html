@@ -1,0 +1,43 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Saved Actors</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-accordion-group *ngIf="savedActors.length > 0">
+    <ion-accordion *ngFor="let actor of savedActors" value="{{ actor.id }}">
+      <ion-item slot="header" color="light">
+        <ion-thumbnail slot="start" *ngIf="actor.profile_path">
+          <img [src]="'https://image.tmdb.org/t/p/w92' + actor.profile_path" />
+        </ion-thumbnail>
+
+        <ion-label>
+          <h2>{{ actor.name }}</h2>
+        </ion-label>
+
+        <ion-button fill="clear" slot="end" color="danger" (click)="remove(actor.id)">
+          Remove
+        </ion-button>
+      </ion-item>
+
+      <div class="ion-padding" slot="content">
+        <ion-list *ngIf="actor.known_for?.length > 0">
+          <ion-item *ngFor="let work of actor.known_for">
+            <ion-label>
+              <h3>{{ work.title || work.name }}</h3>
+              <p>{{ work.media_type | titlecase }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+        <ion-text *ngIf="!actor.known_for || actor.known_for.length === 0">
+          No roles available.
+        </ion-text>
+      </div>
+    </ion-accordion>
+  </ion-accordion-group>
+
+  <ion-text *ngIf="savedActors.length === 0" color="medium">
+    <p class="ion-text-center">No saved actors yet.</p>
+  </ion-text>
+</ion-content>
