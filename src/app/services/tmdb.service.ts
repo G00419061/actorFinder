@@ -29,4 +29,17 @@ export class TmdbService {
     const params = new HttpParams().set('api_key', this.apiKey);
     return this.http.get(`${this.baseUrl}/person/${personId}/combined_credits`, { params });
   }
+
+  getPopularActors(): Observable<any> {
+    const randomPage = Math.floor(Math.random() * 100) + 1;
+  
+    return this.http.get(`${this.baseUrl}/person/popular`, {
+      params: {
+        api_key: this.apiKey,
+        page: randomPage
+      }
+    });
+  }
+  
+  
 }

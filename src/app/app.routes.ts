@@ -22,10 +22,19 @@ export const routes: Routes = [
         component: SavedPage,
       },
       {
+        path: 'quiz',
+        loadComponent: () => import('./quiz/quiz.page').then(m => m.ActorQuizPage)
+      },
+      {
         path: '',
         redirectTo: 'home',
         pathMatch: 'full',
       },
     ],
   },
+  {
+    path: 'quiz',
+    loadComponent: () => import('./quiz/quiz.page').then(m => m.ActorQuizPage)
+  }
+  
 ];
