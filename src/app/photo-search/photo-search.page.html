@@ -1,0 +1,13 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Photo Search</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-button expand="full" (click)="takePhoto()">Take a Photo</ion-button>
+
+  <ion-img *ngIf="capturedImage" [src]="capturedImage"></ion-img>
+
+  <!-- Future: Display results after comparing to API -->
+</ion-content>
