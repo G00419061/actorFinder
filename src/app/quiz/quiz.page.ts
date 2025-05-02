@@ -4,6 +4,12 @@ import { IonicModule, AlertController } from '@ionic/angular';
 import { HttpClientModule } from '@angular/common/http';
 import { TmdbService } from '../services/tmdb.service';
 
+interface Actor {
+  id: number;
+  name: string;
+  profile_path: string;
+}
+
 @Component({
   selector: 'app-quiz',
   standalone: true,
@@ -12,12 +18,11 @@ import { TmdbService } from '../services/tmdb.service';
   imports: [CommonModule, IonicModule, HttpClientModule],
 })
 export class ActorQuizPage {
-  actorOptions: any[] = [];
-  correctActor: any;
+  actorOptions: Actor[] = [];
+  correctActor!: Actor;
   actorImageUrl: string = '';
-  options: any[] = []; 
+  options: Actor[] = [];
   previousActorId: number | null = null;
-
 
   constructor(private tmdb: TmdbService, private alertCtrl: AlertController) {
     this.loadQuestion();
@@ -25,29 +30,38 @@ export class ActorQuizPage {
 
   loadQuestion() {
     this.tmdb.getPopularActors().subscribe((res: any) => {
-      const actorsWithImages = res.results.filter(
-        (actor: any) => actor.profile_path && actor.popularity > 10
-      );
-      
-  
+      const actorsWithImages: Actor[] = res.results.filter((actor: Actor) => actor.profile_path);
+
       if (actorsWithImages.length < 4) {
         this.loadQuestion(); // Retry if not enough valid actors
         return;
       }
-  
+
       const shuffled = actorsWithImages.sort(() => 0.5 - Math.random());
-      const selected = shuffled.slice(0, 4);
-  
-      this.correctActor = selected[0];
-      this.options = this.shuffleArray([...selected]);
+
+      const correctActor = shuffled.find((actor: Actor) => actor.id !== this.previousActorId);
+
+      if (!correctActor) {
+        this.loadQuestion(); // Retry if all actors are duplicates
+        return;
+      }
+
+      this.correctActor = correctActor;
+      this.previousActorId = correctActor.id;
+
+      const otherOptions = shuffled
+        .filter((actor: Actor) => actor.id !== correctActor.id)
+        .slice(0, 3);
+
+      this.options = this.shuffleArray([correctActor, ...otherOptions]);
     });
   }
 
-  shuffleArray(array: any[]): any[] {
+  shuffleArray(array: Actor[]): Actor[] {
     return array.sort(() => Math.random() - 0.5);
   }
 
-  async selectAnswer(selected: any) {
+  async selectAnswer(selected: Actor) {
     const isCorrect = selected.id === this.correctActor.id;
 
     const alert = await this.alertCtrl.create({

@@ -31,7 +31,7 @@ export class TmdbService {
   }
 
   getPopularActors(): Observable<any> {
-    const randomPage = Math.floor(Math.random() * 100) + 1;
+    const randomPage = Math.floor(Math.random() * 10) + 1;
   
     return this.http.get(`${this.baseUrl}/person/popular`, {
       params: {
