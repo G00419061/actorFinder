@@ -25,6 +25,7 @@ export class HomePage {
   credits: any[] = [];
   searchResults: any[] = [];
   showSuggestions: boolean = false;
+  selectedActor: any = null;
 
   filterType: string = 'all';
   startYear: number | null = null;
@@ -46,11 +47,12 @@ export class HomePage {
       this.actorImageUrl = '';
       this.searchResults = [];
       this.showSuggestions = false;
+      this.selectedActor = null;
       return;
     }
 
     this.tmdb.searchActor(this.actorName).subscribe((res: any) => {
-      this.searchResults = res.results.slice(0, 5); // Show top 5 suggestions
+      this.searchResults = res.results.slice(0, 5);
       this.showSuggestions = true;
     });
   }
@@ -59,6 +61,7 @@ export class HomePage {
     this.actorName = actor.name;
     this.actorFullName = actor.name;
     this.actorImageUrl = 'https://image.tmdb.org/t/p/w500' + actor.profile_path;
+    this.selectedActor = actor;
     this.showSuggestions = false;
 
     this.tmdb.getActorCredits(actor.id).subscribe((creditsRes: any) => {
@@ -71,12 +74,11 @@ export class HomePage {
       .filter(item => {
         const dateStr = item.release_date || item.first_air_date;
         if (!dateStr) return false;
-  
+
         const year = parseInt(dateStr.slice(0, 4), 10);
-  
         const matchesType = this.filterType === 'all' || item.media_type === this.filterType;
         const matchesYearRange = year >= this.yearRange.lower && year <= this.yearRange.upper;
-  
+
         return matchesType && matchesYearRange;
       })
       .sort((a, b) => {
@@ -85,13 +87,14 @@ export class HomePage {
         return dateB - dateA;
       });
   }
-  
 
-  async save(actor: any) {
-    await this.storageService.saveActor(actor);
+  async save() {
+    if (!this.selectedActor) return;
+
+    await this.storageService.saveActor(this.selectedActor);
 
     const toast = await this.toastController.create({
-      message: `${actor.name} has been saved!`,
+      message: `${this.selectedActor.name} has been saved!`,
       duration: 2000,
       color: 'success',
       position: 'top'

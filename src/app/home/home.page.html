@@ -12,6 +12,7 @@
     </ion-input>
   </ion-item>
 
+  <!-- Suggested Results -->
   <ion-list *ngIf="showSuggestions && searchResults.length > 0">
     <ion-item button *ngFor="let actor of searchResults" (click)="selectSuggestion(actor)">
       <ion-avatar slot="start">
@@ -22,23 +23,21 @@
       </ion-label>
     </ion-item>
   </ion-list>
-  
 
-  <!-- Actor Profile Image and Full Name -->
+  <!-- Actor Profile -->
   <ion-card *ngIf="actorImageUrl || actorFullName">
     <img *ngIf="actorImageUrl" [src]="actorImageUrl" alt="Actor Image" />
     <ion-card-header>
       <ion-card-title>{{ actorFullName }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <ion-button fill="solid" color="primary" expand="block" (click)="save(searchResults[0])"
-        class="animate__animated animate__pulse">
+      <ion-button fill="solid" color="primary" expand="block" (click)="save()" class="animate__animated animate__pulse">
         Save
       </ion-button>
     </ion-card-content>
   </ion-card>
 
-  <!-- Filter Segment -->
+  <!-- Filters -->
   <ion-segment [(ngModel)]="filterType">
     <ion-segment-button value="all">
       <ion-label>All</ion-label>
@@ -59,7 +58,7 @@
     </ion-range>
   </ion-item>
 
-  <!-- Movie/TV Credits List -->
+  <!-- Credits List -->
   <ion-list *ngIf="credits.length > 0">
     <ion-list-header>
       Works
@@ -76,7 +75,6 @@
         <p *ngIf="item.character">Role: {{ item.character }}</p>
       </ion-label>
     </ion-item>
-
   </ion-list>
 
   <!-- No Results -->
