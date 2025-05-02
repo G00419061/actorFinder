@@ -32,9 +32,4 @@ export const routes: Routes = [
       },
     ],
   },
-  {
-    path: 'quiz',
-    loadComponent: () => import('./quiz/quiz.page').then(m => m.ActorQuizPage)
-  }
-  
 ];
