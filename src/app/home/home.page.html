@@ -8,13 +8,21 @@
   <!-- Actor Search Input -->
   <ion-item>
     <ion-label position="stacked">Actor</ion-label>
-    <ion-input
-      [(ngModel)]="actorName"
-      (ionInput)="onSearchChange()"
-      placeholder="Enter actor name"
-      clearInput>
+    <ion-input [(ngModel)]="actorName" (ionInput)="onSearchChange()" placeholder="Enter actor name" clearInput>
     </ion-input>
   </ion-item>
+
+  <ion-list *ngIf="showSuggestions && searchResults.length > 0">
+    <ion-item button *ngFor="let actor of searchResults" (click)="selectSuggestion(actor)">
+      <ion-avatar slot="start">
+        <img [src]="'https://image.tmdb.org/t/p/w92' + actor.profile_path" (error)="onImageError($event)">
+      </ion-avatar>
+      <ion-label>
+        {{ actor.name }}
+      </ion-label>
+    </ion-item>
+  </ion-list>
+  
 
   <!-- Actor Profile Image and Full Name -->
   <ion-card *ngIf="actorImageUrl || actorFullName">
@@ -23,13 +31,8 @@
       <ion-card-title>{{ actorFullName }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <ion-button
-        fill="solid"
-        color="primary"
-        expand="block"
-        (click)="save(searchResults[0])"
-        class="animate__animated animate__pulse"
-      >
+      <ion-button fill="solid" color="primary" expand="block" (click)="save(searchResults[0])"
+        class="animate__animated animate__pulse">
         Save
       </ion-button>
     </ion-card-content>
@@ -50,14 +53,7 @@
 
   <ion-item>
     <ion-label>Year Range</ion-label>
-    <ion-range 
-      [(ngModel)]="yearRange"
-      [min]="minYear"
-      [max]="maxYear"
-      pin="true"
-      dualKnobs="true"
-      snaps="true"
-    >
+    <ion-range [(ngModel)]="yearRange" [min]="minYear" [max]="maxYear" pin="true" dualKnobs="true" snaps="true">
       <ion-label slot="start">{{ yearRange.lower }}</ion-label>
       <ion-label slot="end">{{ yearRange.upper }}</ion-label>
     </ion-range>
@@ -70,11 +66,9 @@
     </ion-list-header>
     <ion-item *ngFor="let item of filteredCredits">
       <ion-thumbnail slot="start">
-        <img 
-          [src]="item.poster_path ? 'https://image.tmdb.org/t/p/w92' + item.poster_path : 'assets/img/fallback-poster.jpg'" 
-          alt="Poster"
-          (error)="onImageError($event)"
-        >
+        <img
+          [src]="item.poster_path ? 'https://image.tmdb.org/t/p/w92' + item.poster_path : 'assets/img/fallback-poster.jpg'"
+          alt="Poster" (error)="onImageError($event)">
       </ion-thumbnail>
       <ion-label>
         <h2>{{ item.title || item.name }}</h2>
@@ -82,7 +76,7 @@
         <p *ngIf="item.character">Role: {{ item.character }}</p>
       </ion-label>
     </ion-item>
-    
+
   </ion-list>
 
   <!-- No Results -->

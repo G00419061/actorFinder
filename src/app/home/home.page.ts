@@ -24,6 +24,8 @@ export class HomePage {
   actorImageUrl: string = '';
   credits: any[] = [];
   searchResults: any[] = [];
+  showSuggestions: boolean = false;
+
   filterType: string = 'all';
   startYear: number | null = null;
   endYear: number | null = null;
@@ -31,55 +33,59 @@ export class HomePage {
   maxYear = new Date().getFullYear();
   yearRange = { lower: this.minYear, upper: this.maxYear };
 
-
-
   constructor(
     private tmdb: TmdbService,
     private storageService: StorageService,
     private toastController: ToastController
-  ) { }
+  ) {}
 
   onSearchChange() {
     if (this.actorName.trim().length < 2) {
       this.credits = [];
       this.actorFullName = '';
       this.actorImageUrl = '';
+      this.searchResults = [];
+      this.showSuggestions = false;
       return;
     }
 
     this.tmdb.searchActor(this.actorName).subscribe((res: any) => {
-      this.searchResults = res.results;
-      const actor = res.results[0];
-      if (actor) {
-        this.actorFullName = actor.name;
-        this.actorImageUrl = 'https://image.tmdb.org/t/p/w500' + actor.profile_path;
+      this.searchResults = res.results.slice(0, 5); // Show top 5 suggestions
+      this.showSuggestions = true;
+    });
+  }
 
-        this.tmdb.getActorCredits(actor.id).subscribe((creditsRes: any) => {
-          this.credits = creditsRes.cast;
-        });
-      } else {
-        this.credits = [];
-        this.actorFullName = '';
-        this.actorImageUrl = '';
-      }
+  selectSuggestion(actor: any) {
+    this.actorName = actor.name;
+    this.actorFullName = actor.name;
+    this.actorImageUrl = 'https://image.tmdb.org/t/p/w500' + actor.profile_path;
+    this.showSuggestions = false;
+
+    this.tmdb.getActorCredits(actor.id).subscribe((creditsRes: any) => {
+      this.credits = creditsRes.cast;
     });
   }
 
   get filteredCredits() {
-    return this.credits.filter(item => {
-      const dateStr = item.release_date || item.first_air_date;
-      if (!dateStr) return false;
+    return this.credits
+      .filter(item => {
+        const dateStr = item.release_date || item.first_air_date;
+        if (!dateStr) return false;
   
-      const year = parseInt(dateStr.slice(0, 4), 10);
+        const year = parseInt(dateStr.slice(0, 4), 10);
   
-      const matchesType = this.filterType === 'all' || item.media_type === this.filterType;
-      const matchesYearRange = year >= this.yearRange.lower && year <= this.yearRange.upper;
+        const matchesType = this.filterType === 'all' || item.media_type === this.filterType;
+        const matchesYearRange = year >= this.yearRange.lower && year <= this.yearRange.upper;
   
-      return matchesType && matchesYearRange;
-    });
+        return matchesType && matchesYearRange;
+      })
+      .sort((a, b) => {
+        const dateA = new Date(a.release_date || a.first_air_date).getTime();
+        const dateB = new Date(b.release_date || b.first_air_date).getTime();
+        return dateB - dateA;
+      });
   }
   
-
 
   async save(actor: any) {
     await this.storageService.saveActor(actor);
@@ -97,5 +103,4 @@ export class HomePage {
   onImageError(event: any) {
     event.target.src = 'assets/img/fallback-poster.jpg';
   }
-
 }

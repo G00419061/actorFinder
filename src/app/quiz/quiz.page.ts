@@ -16,6 +16,8 @@ export class ActorQuizPage {
   correctActor: any;
   actorImageUrl: string = '';
   options: any[] = []; 
+  previousActorId: number | null = null;
+
 
   constructor(private tmdb: TmdbService, private alertCtrl: AlertController) {
     this.loadQuestion();
